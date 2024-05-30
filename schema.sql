@@ -39,3 +39,20 @@ CREATE TABLE IF NOT EXISTS events
     ENGINE = ReplacingMergeTree()
         PRIMARY KEY (transaction_id, action_ordinal)
         ORDER BY (transaction_id, action_ordinal);
+
+
+-- block_id
+-- block_number
+-- timestamp
+-- operation
+-- action_index
+-- code
+-- scope
+-- table_name
+-- primary_key
+-- new_data
+-- new_data_json
+-- new_payer
+-- old_data
+-- old_data_json
+-- old_payer

@@ -32,11 +32,20 @@ modules:
     output:
       type: proto:sf.antelope.type.v1.ActionTraces
 
+  - name: map_changes
+    kind: map
+    inputs:
+      - params: string
+      - source: sf.antelope.type.v1.Block
+    output:
+      type: proto:sf.antelope.type.v1.DBOps
+
   - name: db_out
     kind: map
     inputs:
       - source: sf.substreams.v1.Clock
       - map: map_events
+      - map: map_changes
     blockFilter:
       module: index_transactions
       query:
@@ -45,30 +54,13 @@ modules:
     output:
       type: proto:sf.substreams.sink.database.v1.DatabaseChanges
 
-params:
-  map_events: "eosio::buyram"
-
-  # - name: graph_out
-  #   kind: map
-  #   inputs:
-  #     - map: map_events
-  #   output:
-  #     type: proto:sf.substreams.sink.entity.v1.EntityChanges
-
-  # - name: ch_out
-  #   kind: map
-  #   inputs:
-  #     - map: map_events
-  #   output:
-  #     type: proto:sf.substreams.sink.database.v1.DatabaseChanges
-
-# sink:
-#   module: ch_out
-#   type: sf.substreams.sink.sql.v1.Service
-#   config:
-#     schema: "./schema.sql"
-#     engine: clickhouse
-#     postgraphile_frontend:
-#       enabled: false
-#     pgweb_frontend:
-#       enabled: false
+sink:
+  module: db_out
+  type: sf.substreams.sink.sql.v1.Service
+  config:
+    schema: "./schema.sql"
+    engine: clickhouse
+    postgraphile_frontend:
+      enabled: false
+    pgweb_frontend:
+      enabled: false

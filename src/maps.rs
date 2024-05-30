@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 use substreams::errors::Error;
 // use substreams::log;
-use substreams_antelope::pb::ActionTraces;
+use substreams_antelope::pb::{ActionTraces, DbOps};
 use substreams_antelope::Block;
 
 #[substreams::handlers::map]
@@ -17,7 +17,7 @@ fn map_events(params: String, block: Block) -> Result<ActionTraces, Error> {
         allowed_actions.insert(action.to_string());
     }
 
-    // ram.defi
+    // BRAM ram.defi
     allowed_actions.insert("ram.defi::create".to_string());
     allowed_actions.insert("ram.defi::depositlog".to_string());
     allowed_actions.insert("ram.defi::depositram".to_string());
@@ -28,12 +28,19 @@ fn map_events(params: String, block: Block) -> Result<ActionTraces, Error> {
     allowed_actions.insert("ram.defi::withdrawlog".to_string());
     allowed_actions.insert("ram.defi::withdrawram".to_string());
 
-    // eosio.wram
+    // WRAM eosio.wram
     allowed_actions.insert("eosio.wram::transfer".to_string());
     allowed_actions.insert("eosio.wram::unwrap".to_string());
     allowed_actions.insert("eosio.wram::retire".to_string());
     allowed_actions.insert("eosio.wram::create".to_string());
     allowed_actions.insert("eosio.wram::issue".to_string());
+
+    // RAMS newrams.eos
+    allowed_actions.insert("newrams.eos::transfer".to_string());
+    allowed_actions.insert("newrams.eos::transferlog".to_string());
+    allowed_actions.insert("newrams.eos::retire".to_string());
+    allowed_actions.insert("newrams.eos::create".to_string());
+    allowed_actions.insert("newrams.eos::issue".to_string());
 
     // eosio
     allowed_actions.insert("eosio::setram".to_string());
@@ -62,4 +69,48 @@ fn map_events(params: String, block: Block) -> Result<ActionTraces, Error> {
     }).collect::<Vec<_>>();
 
     Ok( ActionTraces{action_traces} )
+}
+
+
+#[substreams::handlers::map]
+fn map_changes(params: String, block: Block) -> Result<DbOps, Error> {
+    let mut allowed_table_changes = HashSet::new();
+
+    // add additional actions to allowed_table_changes by using params
+    // params "map_changes=eosio::userres,eosio::global1"
+    // split by ","
+    // insert into allowed_table_changes
+    for action in params.split(",") {
+        allowed_table_changes.insert(action.to_string());
+    }
+
+    // BRAM ram.defi
+    allowed_table_changes.insert("ram.defi::accounts".to_string());
+    allowed_table_changes.insert("ram.defi::stat".to_string());
+    allowed_table_changes.insert("ram.defi::config".to_string());
+
+    // WRAM eosio.wram
+    allowed_table_changes.insert("eosio.wram::accounts".to_string());
+    allowed_table_changes.insert("eosio.wram::stat".to_string());
+
+    // RAMS newrams.eos
+    allowed_table_changes.insert("newrams.eos::accounts".to_string());
+    allowed_table_changes.insert("newrams.eos::stat".to_string());
+
+    // eosio
+    allowed_table_changes.insert("eosio::userres".to_string());
+    allowed_table_changes.insert("eosio::global1".to_string());
+    allowed_table_changes.insert("eosio::global2".to_string());
+
+
+    let mut db_ops = Vec::new();
+    for transaction_trace in block.into_transaction_traces() {
+        for db_op in transaction_trace.db_ops {
+            let key = format!("{}::{}", db_op.code.clone().to_string(), db_op.table_name.clone().to_string());
+            if !allowed_table_changes.contains(&key) { continue; }
+            db_ops.push(db_op);
+        }
+    }
+
+    Ok( DbOps{db_ops} )
 }
