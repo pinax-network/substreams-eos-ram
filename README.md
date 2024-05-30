@@ -20,11 +20,10 @@ $ make gui
 
 ```mermaid
 graph TD;
-  sf.antelope.type.v1.Block[source: sf.antelope.type.v1.Block] --> map_events;
-  sf.antelope.type.v1.Block[source: sf.antelope.type.v1.Block] --> map_changes;
+  sf.antelope.type.v1.Block[source: sf.antelope.type.v1.Block] --> | params | map_events;
+  sf.antelope.type.v1.Block[source: sf.antelope.type.v1.Block] --> | params | map_changes;
 
   map_events[map: map_events];
-  map_events:params[params] --> map_events;
   map_events --> index_transactions;
   map_events --> db_out;
 
@@ -33,7 +32,6 @@ graph TD;
   db_out[map: db_out];
 
   map_changes[map: map_changes];
-  map_changes:params[params] --> map_changes;
   map_changes --> db_out;
 ```
 
