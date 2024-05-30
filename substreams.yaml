@@ -1,0 +1,74 @@
+specVersion: v0.1.0
+package:
+  name: eos_ram
+  version: v0.1.0
+  url: https://github.com/pinax-network/substreams-eos-ram
+  doc: Antelope EOS RAM based action traces & database operations.
+
+imports:
+  entities: https://github.com/streamingfast/substreams-sink-entity-changes/releases/download/v1.3.1/substreams-sink-entity-changes-v1.3.1.spkg
+  database_change: https://github.com/streamingfast/substreams-database-change/releases/download/v1.3.1/substreams-database-change-v1.3.1.spkg
+  sql: https://github.com/streamingfast/substreams-sink-sql/releases/download/protodefs-v1.0.3/substreams-sink-sql-protodefs-v1.0.3.spkg
+  antelope: https://github.com/pinax-network/firehose-antelope/releases/download/v0.0.5/antelope-v0.0.5.spkg
+
+binaries:
+  default:
+    type: wasm/rust-v1
+    file: ./target/wasm32-unknown-unknown/release/eos_ram.wasm
+
+modules:
+  - name: index_transactions
+    kind: blockIndex
+    inputs:
+      - map: map_events
+    output:
+      type: proto:sf.substreams.index.v1.Keys
+
+  - name: map_events
+    kind: map
+    inputs:
+      - params: string
+      - source: sf.antelope.type.v1.Block
+    output:
+      type: proto:sf.antelope.type.v1.ActionTraces
+
+  - name: db_out
+    kind: map
+    inputs:
+      - source: sf.substreams.v1.Clock
+      - map: map_events
+    blockFilter:
+      module: index_transactions
+      query:
+        string: eos-ram
+        params: false
+    output:
+      type: proto:sf.substreams.sink.database.v1.DatabaseChanges
+
+params:
+  map_events: "eosio::buyram"
+
+  # - name: graph_out
+  #   kind: map
+  #   inputs:
+  #     - map: map_events
+  #   output:
+  #     type: proto:sf.substreams.sink.entity.v1.EntityChanges
+
+  # - name: ch_out
+  #   kind: map
+  #   inputs:
+  #     - map: map_events
+  #   output:
+  #     type: proto:sf.substreams.sink.database.v1.DatabaseChanges
+
+# sink:
+#   module: ch_out
+#   type: sf.substreams.sink.sql.v1.Service
+#   config:
+#     schema: "./schema.sql"
+#     engine: clickhouse
+#     postgraphile_frontend:
+#       enabled: false
+#     pgweb_frontend:
+#       enabled: false
