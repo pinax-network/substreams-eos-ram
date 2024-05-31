@@ -41,12 +41,12 @@ CREATE TABLE IF NOT EXISTS events
         ORDER BY (transaction_id, action_ordinal);
 
 
-CREATE TABLE IF NOT EXISTS events
+CREATE TABLE IF NOT EXISTS changes
 (
     -- block information --
     block_id        String,
     block_number    UInt64,
-    timestamp       DateTime
+    timestamp       DateTime,
 
     -- transaction information --
     operation       UInt32,

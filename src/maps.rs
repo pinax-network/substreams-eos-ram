@@ -63,6 +63,7 @@ fn map_events(params: String, block: Block) -> Result<ActionTraces, Error> {
         let action = action_trace.clone().action.unwrap();
         let key = format!("{}::{}", action.account.clone().to_string(), action.name.to_string());
         if !allowed_actions.contains(&key) { return None; }
+        if action_trace.receiver != action.account { return None; } // filter out extra inline actions
         // log::debug!("key: {:?}", key);
         return Some(action_trace)
 
@@ -99,9 +100,8 @@ fn map_changes(params: String, block: Block) -> Result<DbOps, Error> {
 
     // eosio
     allowed_table_changes.insert("eosio::userres".to_string());
-    allowed_table_changes.insert("eosio::global1".to_string());
-    allowed_table_changes.insert("eosio::global2".to_string());
-
+    // allowed_table_changes.insert("eosio::global".to_string());
+    // allowed_table_changes.insert("eosio::global2".to_string());
 
     let mut db_ops = Vec::new();
     for transaction_trace in block.into_transaction_traces() {
