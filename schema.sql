@@ -24,13 +24,13 @@ CREATE TABLE IF NOT EXISTS events
     -- block information --
     block_id        String,
     block_number    UInt64,
-    timestamp       DateTime
+    timestamp       DateTime,
 
     -- transaction information --
     transaction_id  String,
     action_ordinal  UInt32,
     account         String,
-    name            String
+    name            String,
 
     -- action information --
     json_data       String,
@@ -41,15 +41,34 @@ CREATE TABLE IF NOT EXISTS events
         ORDER BY (transaction_id, action_ordinal);
 
 
--- block_id
--- block_number
--- timestamp
--- operation
--- action_index
--- code
--- scope
--- table_name
--- primary_key
+CREATE TABLE IF NOT EXISTS events
+(
+    -- block information --
+    block_id        String,
+    block_number    UInt64,
+    timestamp       DateTime
+
+    -- transaction information --
+    operation       UInt32,
+    action_ordinal  UInt32,
+    code            String,
+    scope           String,
+    table_name      String,
+    primary_key     String,
+
+    -- action information --
+    new_data        String,
+    new_data_json   String,
+    new_payer       String,
+    old_data        String,
+    old_data_json   String,
+    old_payer       String
+)
+    ENGINE = ReplacingMergeTree()
+        PRIMARY KEY (transaction_id, action_ordinal)
+        ORDER BY (transaction_id, action_ordinal);
+
+
 -- new_data
 -- new_data_json
 -- new_payer
