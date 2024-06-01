@@ -118,7 +118,7 @@ Initial block: 0
 Kind: index
 Input: map: map_events
 Output Type: proto:sf.substreams.index.v1.Keys
-Hash: 6af15ebe31fbfecbca588de0205dff01e992d881
+Hash: f3e1e6a535498780fcb516a793ff1e2f8e570f29
 
 Name: map_events
 Initial block: 0
@@ -126,7 +126,7 @@ Kind: map
 Input: params:
 Input: source: sf.antelope.type.v1.Block
 Output Type: proto:sf.antelope.type.v1.ActionTraces
-Hash: b499352883d27d655b94e12c6ca9d37a9d82a765
+Hash: 2faa843cf22a54383cc849194d58b51464f64595
 
 Name: map_changes
 Initial block: 0
@@ -134,7 +134,7 @@ Kind: map
 Input: params:
 Input: source: sf.antelope.type.v1.Block
 Output Type: proto:sf.antelope.type.v1.DBOps
-Hash: 66cd5720c24787507643370eeccc865df1badefd
+Hash: b47d817b9ea595ac81cb5aab5965224e064a6800
 
 Name: db_out
 Initial block: 0
@@ -144,13 +144,13 @@ Input: map: map_events
 Input: map: map_changes
 Block Filter: (using *index_transactions*): `&{eos-ram}`
 Output Type: proto:sf.substreams.sink.database.v1.DatabaseChanges
-Hash: 27efc8d86cd489e1f997385a3d99e6a76638f03f
+Hash: 2b53a2e7669b789babda7e96ee60ab5679539ee5
 
 Sink config:
 ----
 type: sf.substreams.sink.sql.v1.Service
 configs:
-- schema: (1210 bytes) MD5SUM: 5ea112db72fa88cd8a258c7bff3250db [LOADED_FILE]
+- schema: (1991 bytes) MD5SUM: d026144c1ce34c2699532ae6b858bb61 [LOADED_FILE]
 - dbt_config:
   - files: (empty) [ZIPPED_FOLDER]
   - run_interval_seconds: 0
